@@ -2,7 +2,7 @@ import { reactive } from "../reactive";
 import { effect, stop } from "../effect";
 
 describe("effect", () => {
-  it.skip("happy path", () => {
+  it("happy path", () => {
     const user = reactive({
       age: 10,
     });
@@ -16,7 +16,7 @@ describe("effect", () => {
     expect(nextAge).toBe(12);
   });
 
-  it.skip("should return runner when call effect", () => {
+  it("should return runner when call effect", () => {
     let foo = 10;
     const runner = effect(() => {
       foo++;
@@ -27,7 +27,7 @@ describe("effect", () => {
     expect(foo).toBe(12);
     expect(r).toBe("foo");
   });
-  it.skip("scheduler", () => {
+  it("scheduler", () => {
     let dummy;
     let run: any;
     const scheduler = jest.fn(() => {
@@ -61,21 +61,20 @@ describe("effect", () => {
     obj.prop = 2;
     expect(dummy).toBe(2);
     stop(runner);
-    // obj.prop = 3
-    obj.prop++;
+    obj.prop = 3;
+    // obj.prop++;
     expect(dummy).toBe(2);
     // stopped effect should still be manually callable
     runner();
     expect(dummy).toBe(3);
   });
 
-  // it("events: onStop", () => {
-  //   const onStop = jest.fn();
-  //   const runner = effect(() => {}, {
-  //     onStop,
-  //   });
-
-  //   stop(runner);
-  //   expect(onStop).toHaveBeenCalled();
-  // });
+  it("events: onStop", () => {
+    const onStop = jest.fn();
+    const runner = effect(() => {}, {
+      onStop,
+    });
+    stop(runner);
+    expect(onStop).toHaveBeenCalled();
+  });
 });

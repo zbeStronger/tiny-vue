@@ -1,10 +1,16 @@
+import { extend } from "../utils";
+
+let activeEffect: any;
 let targetMap = new Map();
-let activeEffect;
+let shouldTrack = false;
 
 class ReactiveEffect {
   private _fn;
+  public scheduler: Function | undefined;
   deps = [];
-  constructor(fn, public scheduler?) {
+  active = true;
+  onStop?: () => void;
+  constructor(fn) {
     this._fn = fn;
   }
   run() {
@@ -12,31 +18,43 @@ class ReactiveEffect {
     return this._fn();
   }
   stop() {
-    this.deps.forEach((dep: any) => {
-      dep.delete(this);
-    });
+    if (this.active) {
+      cleanupEffect(this);
+      if (this.onStop) this.onStop();
+      this.active = false;
+    }
   }
 }
+
+function cleanupEffect(effect) {
+  effect.deps.forEach((dep: any) => {
+    dep.delete(effect);
+  });
+}
+
 export function track(target, key) {
+  if (!activeEffect) return;
+  if (!shouldTrack) return;
   let depsMap = targetMap.get(target);
   if (!depsMap) {
     depsMap = new Map();
     targetMap.set(target, depsMap);
   }
-  let dep = depsMap.get(key);
-  if (!dep) {
-    dep = new Set();
-    depsMap.set(key, dep);
+  let deps = depsMap.get(key);
+  if (!deps) {
+    deps = new Set();
+    depsMap.set(key, deps);
   }
-  dep.add(activeEffect);
+  deps.add(activeEffect);
   // 收集所有的effect
-  activeEffect.deps.push(dep);
+  activeEffect.deps.push(deps);
 }
+
 export function trigger(target, key) {
   let depsMap = targetMap.get(target);
-  let dep = depsMap.get(key);
+  let deps = depsMap.get(key);
 
-  for (const effect of dep) {
+  for (const effect of deps) {
     if (effect.scheduler) {
       effect.scheduler();
     } else {
@@ -50,10 +68,11 @@ export function stop(runner) {
 }
 
 export function effect(fn, options: any = {}) {
-  const { scheduler } = options;
-  const _effect = new ReactiveEffect(fn, scheduler);
-  _effect.run();
+  const _effect = new ReactiveEffect(fn);
+  extend(_effect, options);
   const runner: any = _effect.run.bind(_effect);
   runner.effect = _effect;
+  _effect.run();
+
   return runner;
 }
