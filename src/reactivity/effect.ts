@@ -4,14 +4,16 @@ let activeEffect: any;
 let targetMap = new Map();
 let shouldTrack = false;
 
-class ReactiveEffect {
+export class ReactiveEffect {
   private _fn;
   public scheduler: Function | undefined;
   deps = [];
+  // 区分是否stop
   active = true;
   onStop?: () => void;
-  constructor(fn) {
+  constructor(fn, scheduler?) {
     this._fn = fn;
+    this.scheduler = scheduler;
   }
   run() {
     if (!this.active) {
