@@ -1,4 +1,8 @@
-import { readonlyHandlers, baseHandlers } from "./baseHandler";
+import {
+  readonlyHandlers,
+  baseHandlers,
+  shallowReadOnlyHandlers,
+} from "./baseHandler";
 
 export const enum ReactiveFlags {
   IS_REATIVE = "__v_isReactive",
@@ -24,4 +28,12 @@ export function isReactive(value) {
 export function isReadOnly(value) {
   // 响应式对象会触发get操作
   return !!value[ReactiveFlags.IS_READONLY];
+}
+
+export function shallowReadOnly(target) {
+  return createActiveObject(target, shallowReadOnlyHandlers);
+}
+
+export function isProxy(target) {
+  return isReactive(target) || isReadOnly(target);
 }
