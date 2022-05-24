@@ -1,5 +1,10 @@
-import { ReactiveEffect } from "./effect";
-
+import {
+  effect,
+  changeShouldTrack,
+  ReactiveEffect,
+  track,
+  trigger,
+} from "./effect";
 class ComputedRefImpl {
   private _getter;
   private _dirty: boolean = true;
@@ -11,6 +16,7 @@ class ComputedRefImpl {
     this._effect = new ReactiveEffect(getter, () => {
       if (!this._dirty) {
         this._dirty = true;
+        trigger(this, "value");
       }
     });
   }
@@ -19,9 +25,13 @@ class ComputedRefImpl {
       this._dirty = false;
       this._value = this._effect.run();
     }
+    changeShouldTrack(true);
+    track(this, "value");
+    changeShouldTrack(false);
     return this._value;
   }
 }
+
 export function computed(getter) {
   return new ComputedRefImpl(getter);
 }

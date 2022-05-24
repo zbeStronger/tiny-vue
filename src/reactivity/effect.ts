@@ -3,6 +3,8 @@ import { extend } from "../utils";
 let activeEffect: any;
 let targetMap = new Map();
 let shouldTrack = false;
+// effect栈
+const effectStack: any[] = [];
 
 export class ReactiveEffect {
   private _fn;
@@ -17,13 +19,21 @@ export class ReactiveEffect {
   }
   run() {
     if (!this.active) {
+      // 执行fn会触发track逻辑，此时shouldTrack = false， 不会进行收集依赖
       return this._fn();
     }
     shouldTrack = true;
     activeEffect = this;
+    // effect嵌套处理，不处理的话内层effect会覆盖外层effect，导致外层副作用函数收集不到
+    effectStack.push(this);
     const res = this._fn();
+    effectStack.pop();
+    if (effectStack.length > 0) {
+      activeEffect = effectStack[effectStack.length - 1];
+    }
     //reset
     shouldTrack = false;
+
     return res;
   }
   stop() {
@@ -60,6 +70,10 @@ export function triggerEffects(deps) {
       effect.run();
     }
   }
+}
+
+export function changeShouldTrack(state) {
+  shouldTrack = state;
 }
 
 export function track(target, key) {

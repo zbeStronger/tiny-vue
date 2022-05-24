@@ -1,4 +1,5 @@
 import { computed } from "../computed";
+import { effect } from "../effect";
 import { reactive } from "../reactive";
 
 describe("computed", () => {
@@ -28,5 +29,19 @@ describe("computed", () => {
 
     cValue.value;
     expect(getter).toHaveBeenCalledTimes(2);
+  });
+
+  it("effect nesting", () => {
+    const obj = reactive({ foo: 1 });
+    const user = computed(() => obj.foo + 1);
+    let dummy;
+    effect(() => {
+      dummy = user.value;
+    });
+    expect(user.value).toBe(2);
+    expect(dummy).toBe(2);
+    obj.foo++;
+    expect(user.value).toBe(3);
+    expect(dummy).toBe(3);
   });
 });
