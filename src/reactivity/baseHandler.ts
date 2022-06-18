@@ -14,9 +14,11 @@ function createGetter(isReadOnly = false, shallow = false) {
       return isReadOnly;
     }
     const res = Reflect.get(target, key);
+    //浅只读
     if (shallow) {
       return res;
     }
+    // 深响应
     if (isObject(res)) {
       if (isReadOnly) {
         return readonly(res);

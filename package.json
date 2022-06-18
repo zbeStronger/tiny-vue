@@ -1,18 +1,23 @@
 {
   "name": "tiny-vue",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "lib/guide-tiny-vue.cjs.js",
+  "module": "lib/guide-tiny-vue.esm.js",
   "license": "MIT",
   "devDependencies": {
     "@babel/core": "^7.17.8",
     "@babel/preset-env": "^7.16.11",
     "@babel/preset-typescript": "^7.16.7",
+    "@rollup/plugin-typescript": "^8.3.3",
     "@types/jest": "^27.4.1",
     "babel-jest": "^27.5.1",
     "jest": "^27.5.1",
+    "rollup": "^2.75.6",
+    "tslib": "^2.4.0",
     "typescript": "^4.6.2"
   },
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "build": "rollup -c rollup.config.js"
   }
 }

@@ -7,3 +7,10 @@ export function isObject(val) {
 export const hasChanged = (val, newVal) => {
   return !Object.is(val, newVal);
 };
+
+export const capitalize = (str: string) => {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+};
+export const toHandlerKey = (str: string) => {
+  return str ? "on" + capitalize(str) : "";
+};

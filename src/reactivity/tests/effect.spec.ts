@@ -5,12 +5,22 @@ describe("effect", () => {
   it("happy path", () => {
     const user = reactive({
       age: 10,
+      boy: {
+        age: 20,
+      },
     });
     let nextAge;
+    let boyAge;
     effect(() => {
       nextAge = user.age + 1;
     });
+    effect(() => {
+      boyAge = user.boy.age;
+    });
     expect(nextAge).toBe(11);
+    user.boy.age++;
+    expect(boyAge).toBe(21);
+
     //update
     user.age++;
     expect(nextAge).toBe(12);
@@ -54,6 +64,7 @@ describe("effect", () => {
     // // should have run
     expect(dummy).toBe(2);
   });
+
   it("stop", () => {
     let dummy;
     const obj = reactive({ prop: 1 });
