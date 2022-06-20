@@ -1,4 +1,4 @@
-import { extend } from "../utils";
+import { extend } from "../utils/index";
 
 let activeEffect: any;
 let targetMap = new Map();

@@ -1,4 +1,4 @@
-import { hasChanged, isObject } from "../utils";
+import { hasChanged, isObject } from "../utils/index";
 import { trackEffects, triggerEffects, isTracking } from "./effect";
 import { reactive } from "./reactive";
 

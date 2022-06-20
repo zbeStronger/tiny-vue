@@ -1,4 +1,4 @@
-import { extend, isObject } from "../utils";
+import { extend, isObject } from "../utils/index";
 import { track, trigger } from "./effect";
 import { reactive, ReactiveFlags, readonly } from "./reactive";
 const get = createGetter();
