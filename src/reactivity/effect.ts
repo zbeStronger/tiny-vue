@@ -33,7 +33,6 @@ export class ReactiveEffect {
     }
     //reset
     shouldTrack = false;
-
     return res;
   }
   stop() {

@@ -1,18 +1,24 @@
 import { createRenderer } from "../runtime-core";
-
+//创建元素
 function createElement(type) {
   return document.createElement(type);
 }
-function patchProp(el, key, value) {
+//设置属性
+function patchProp(el, key, prevVal, nextVal) {
   const isOn = (key: string) => /^on[A-Z]/.test(key);
   if (isOn(key)) {
-    el.setAttribute(key, value);
+    el.setAttribute(key, nextVal);
     const event = key.slice(2).toLowerCase();
-    el.addEventListener(event, value);
+    el.addEventListener(event, nextVal);
   } else {
-    el.setAttribute(key, value);
+    if (nextVal == null) {
+      el.removeAttribute(key);
+    } else {
+      el.setAttribute(key, nextVal);
+    }
   }
 }
+//插入元素
 function insert(el, container) {
   container.append(el);
 }
