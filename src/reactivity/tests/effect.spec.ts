@@ -32,10 +32,10 @@ describe("effect", () => {
     };
     const runner = effect(() => {
       foo.a++;
-      return "foo";
+      // return "foo";
     });
     expect(foo.a).toBe(11);
-    // const r = runner();
+    const r = runner();
     // expect(foo).toBe(12);
     // expect(r).toBe("foo");
   });

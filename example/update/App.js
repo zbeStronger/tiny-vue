@@ -38,6 +38,7 @@ export const App = {
         id: "root",
         foo: this.props.foo,
         bar: this.props.bar,
+        count: this.count,
       },
       [
         h("div", { class: "count" }, "count:" + this.count),
