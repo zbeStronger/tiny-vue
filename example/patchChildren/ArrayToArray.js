@@ -6,13 +6,47 @@ const prevChildren = [
   h("p", { key: "A" }, "A"),
   h("p", { key: "B" }, "B"),
   h("p", { key: "C" }, "C"),
+  h("p", { key: "D" }, "D"),
+  h("p", { key: "E" }, "E"),
+  h("p", { key: "F" }, "F"),
+  h("p", { key: "G" }, "G"),
 ];
 const nextChildren = [
   h("p", { key: "A" }, "A"),
   h("p", { key: "B" }, "B"),
-  h("p", { key: "D" }, "D"),
-  h("p", { key: "D" }, "D"),
+  h("p", { key: "E" }, "E"),
+  h("p", { key: "C" }, "C"),
+  h("p", { key: "F" }, "F"),
+  h("p", { key: "G" }, "G"),
 ];
+// 右侧的对比
+// const prevChildren = [
+//   h("p", { key: "A" }, "A"),
+//   h("p", { key: "B" }, "B"),
+//   h("p", { key: "C" }, "C"),
+// ];
+// const nextChildren = [
+//   h("p", { key: "D" }, "D"),
+//   h("p", { key: "E" }, "E"),
+//   h("p", { key: "B" }, "B"),
+//   h("p", { key: "C" }, "C"),
+// ];
+
+// const prevChildren = [h("p", { key: "A" }, "A"), h("p", { key: "B" }, "B")];
+// const nextChildren = [
+//   h("p", { key: "A" }, "A"),
+//   h("p", { key: "B" }, "B"),
+//   h("p", { key: "C" }, "C"),
+// ];
+// const prevChildren = [h("p", { key: "A" }, "A"), h("p", { key: "B" }, "B")];
+// const nextChildren = [
+//   h("p", { key: "A" }, "A"),
+//   h("p", { key: "B" }, "B"),
+//   h("p", { key: "C" }, "C"),
+//   h("p", { key: "D" }, "D"),
+// ];
+// const prevChildren = [h("p", { key: "A" }, "A"), h("p", { key: "B" }, "B")];
+// const nextChildren = [h("p", { key: "A" }, "A")];
 const ArrayToArray = {
   name: "ArrayToArray",
   setup() {

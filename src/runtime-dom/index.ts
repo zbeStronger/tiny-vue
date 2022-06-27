@@ -19,11 +19,12 @@ function patchProp(el, key, prevVal, nextVal) {
   }
 }
 //插入元素
-function insert(el, container) {
-  container.append(el);
+function insert(el, container, anchor) {
+  // container.append(el);
+  container.insertBefore(el, anchor || null);
 }
 function remove(child) {
-  const parent = child.parent;
+  const parent = child.parentNode;
   if (parent) {
     parent.removeChild(child);
   }
