@@ -2,7 +2,9 @@ import { effect } from "../reactivity/effect";
 import { isObject } from "../utils/index";
 import { ShapeFlags } from "../utils/shapeFlags";
 import { createComponentInstance, setupComponent } from "./component";
+import { shouldUpdateComponent } from "./componentUpdateUtils";
 import { createAppAPI } from "./createApp";
+import { queueJobs } from "./scheduler";
 import { Fragment, Text } from "./vnode";
 export function createRenderer(options) {
   const {
@@ -44,7 +46,21 @@ export function createRenderer(options) {
     }
   }
   function processComponent(n1, n2, container: any, anchor, parentComponent) {
-    mountComponent(n2, container, anchor, parentComponent);
+    if (!n1) {
+      mountComponent(n2, container, anchor, parentComponent);
+    } else {
+      updateComponent(n1, n2);
+    }
+  }
+  function updateComponent(n1, n2) {
+    const instance = (n2.component = n1.component);
+    if (shouldUpdateComponent(n1, n2)) {
+      instance.next = n2;
+      instance.update();
+    } else {
+      n2.el = n1.el;
+      instance.vnode = n2;
+    }
   }
   function processElement(n1, n2, container: any, anchor, parentComponent) {
     if (!n1) {
@@ -55,9 +71,9 @@ export function createRenderer(options) {
   }
   const EMPTY_OBJ = {};
   function patchElement(n1, n2, container, anchor, parentComponent) {
-    console.log(n1);
-    console.log(n2);
-    console.log(container);
+    // console.log(n1);
+    // console.log(n2);
+    // console.log(container);
     const oldProps = n1.props || EMPTY_OBJ;
     const newProps = n2.props || EMPTY_OBJ;
     const el = (n2.el = n1.el);
@@ -248,7 +264,11 @@ export function createRenderer(options) {
     anchor,
     parentComponent
   ) {
-    const instance = createComponentInstance(initialVNode, parentComponent);
+    // 虚拟节点上挂载instance实例，用于组件更新
+    const instance = (initialVNode.component = createComponentInstance(
+      initialVNode,
+      parentComponent
+    ));
     setupComponent(instance);
     setupRenderEffect(instance, initialVNode, container, anchor);
   }
@@ -259,27 +279,44 @@ export function createRenderer(options) {
     container: any,
     anchor
   ) {
-    effect(() => {
-      // 初始化
-      if (!instance.isMounted) {
-        const { proxy } = instance;
-        const subTree = (instance.subTree = instance.render.call(proxy));
-        patch(null, subTree, container, anchor, instance);
-        initialVNode.el = subTree.el;
-        instance.isMounted = true;
-      } else {
-        //更新
-        const { proxy } = instance;
-        const subTree = instance.render.call(proxy);
-        const preSubTree = instance.subTree;
-        instance.subTree = subTree;
-        patch(preSubTree, subTree, container, anchor, instance);
-        initialVNode.el = subTree.el;
-        instance.isMounted = true;
+    instance.update = effect(
+      () => {
+        // 初始化
+        if (!instance.isMounted) {
+          const { proxy } = instance;
+          const subTree = (instance.subTree = instance.render.call(proxy));
+          patch(null, subTree, container, anchor, instance);
+          initialVNode.el = subTree.el;
+          instance.isMounted = true;
+        } else {
+          console.log("更新");
+          //更新
+          const { next, vnode } = instance;
+          if (next) {
+            next.el = vnode.el;
+            updateComponentPreRender(instance, next);
+          }
+          const { proxy } = instance;
+          const subTree = instance.render.call(proxy);
+          const preSubTree = instance.subTree;
+          instance.subTree = subTree;
+          patch(preSubTree, subTree, container, anchor, instance);
+          initialVNode.el = subTree.el;
+          instance.isMounted = true;
+        }
+      },
+      {
+        scheduler() {
+          queueJobs(instance.update);
+        },
       }
-    });
+    );
   }
-
+  function updateComponentPreRender(instacne, nextVNode) {
+    instacne.vnode = nextVNode;
+    instacne.next = null;
+    instacne.props = nextVNode.props;
+  }
   function mountElement(vnode: any, container: any, anchor, parentComponent) {
     // document.createElement(vnode.type)
     const el = (vnode.el = hostCreateElemnt(vnode.type));
