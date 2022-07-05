@@ -3,7 +3,7 @@ export const enum NodeTypes {
   SIMPLE_EXPRESSION = "simple_expression",
   ELEMENT = "element",
   TEXT = "text",
-  ROOT = "ROOT",
+  ROOT = "root",
 }
 
 export const enum TagType {

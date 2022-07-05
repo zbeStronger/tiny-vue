@@ -4,6 +4,7 @@ export function baseParse(content: string) {
   const context = createParserContext(content);
   return creatRoot(parseChildren(context, []));
 }
+
 function parseChildren(context, ancestors) {
   const nodes: any[] = [];
   while (!isEnd(context, ancestors)) {
@@ -22,7 +23,6 @@ function parseChildren(context, ancestors) {
     }
     nodes.push(node);
   }
-
   return nodes;
 }
 
@@ -38,10 +38,6 @@ function isEnd(context, ancestors) {
       }
     }
   }
-  // if (parentTag && source.startsWith(`</${parentTag}>`)) {
-  //   return true;
-  // }
-
   return !source;
 }
 
@@ -75,6 +71,7 @@ function createParserContext(content: string) {
 function creatRoot(children) {
   return {
     children,
+    type: NodeTypes.ROOT,
   };
 }
 function advanceBy(context: any, length: number) {
