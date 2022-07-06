@@ -8,27 +8,44 @@ export function transform(root, options = {}) {
   root.helpers = [...context.helpers.keys()];
 }
 function traverseNode(node: any, context) {
-  const children = node.children;
-  const nodeTransforms = context.nodeTransforms;
-  nodeTransforms.forEach((fn) => {
-    fn(node);
-  });
+  const type: NodeTypes = node.type;
 
-  switch (node.type) {
+  // 遍历调用所有的 nodeTransforms
+  // 把 node 给到 transform
+  // 用户可以对 node 做处理
+  const nodeTransforms = context.nodeTransforms;
+  const exitFns: any = [];
+  for (let i = 0; i < nodeTransforms.length; i++) {
+    const transform = nodeTransforms[i];
+
+    const onExit = transform(node, context);
+    if (onExit) {
+      exitFns.push(onExit);
+    }
+  }
+
+  switch (type) {
     case NodeTypes.INTERPOLATION:
       context.helper(TO_DISPLAY_STRING);
       break;
+
     case NodeTypes.ROOT:
-      traverseChildren(children, context);
-      break;
     case NodeTypes.ELEMENT:
-      traverseChildren(children, context);
+      traverseChildren(node, context);
       break;
+
     default:
       break;
   }
+
+  let i = exitFns.length;
+  while (i--) {
+    exitFns[i]();
+  }
 }
-function traverseChildren(children, context) {
+
+function traverseChildren(node, context) {
+  const children = node.children;
   for (let i = 0; i < children.length; i++) {
     const node = children[i];
     traverseNode(node, context);
@@ -46,5 +63,10 @@ function createTransformContext(root: any, options: any) {
   return context;
 }
 function createRootCodegen(root: any) {
-  root.codegenNode = root.children[0];
+  const child = root.children[0];
+  if (child.type === NodeTypes.ELEMENT) {
+    root.codegenNode = child.codegenNode;
+  } else {
+    root.codegenNode = root.children[0];
+  }
 }
